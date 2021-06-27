@@ -1,6 +1,6 @@
 var bg;
 var boy,boyRDead,boyRIdle,boyRJump,boyRRun,boyRSlide,boyLDead,boyLIdle,boyLJump,boyLRun,boyLSlide;
-var gameState="play";
+var gameState="wait";
 var boyDirection="right";
 var boyMoveX="true";
 var zombie, zombieRAttack, zombieRDead, zombieRWalk, zombieLAttack, zombieLDead, zombieLWalk;
@@ -65,7 +65,7 @@ function preload(){
 function setup() {
   createCanvas(1408,640);
   boy=createSprite(400, 200, 50, 50);
-  boy.scale=0.25;
+  {boy.scale=0.25;
   boy.setCollider("rectangle",0,29,230,430)
   boy.addAnimation("boyRIdle", boyRIdle)
   boy.addAnimation("boyRRun", boyRRun)
@@ -76,7 +76,7 @@ function setup() {
   boy.addAnimation("boyLRun", boyLRun)
   boy.addAnimation("boyLDead", boyLDead)
   boy.addAnimation("boyLJump", boyLJump)
-  boy.addAnimation("boyLSlide", boyLSlide)
+  boy.addAnimation("boyLSlide", boyLSlide)}
   
   
   buttonStart=createSprite(width/2, height/2);
@@ -165,75 +165,55 @@ function setup() {
   
   ground9 = createSprite(1088,576);
   ground9.addImage(tile2);
-
+  
   ground10 = createSprite(1216,576);
   ground10.addImage(tile2);
   
   ground11 = createSprite(1344,576);
   ground11.addImage(tile2);}
-
+  
   {barrierX=createSprite(250,320,2,100);
-  barrierX.visible=false;
-  
-  barrierX1=createSprite(635,448,2,100);
-  barrierX1.visible=false;
-  
-  barrierX2=createSprite(900,256,2,230);
-  barrierX2.visible=false;
-  
-  barrierX3=createSprite(1140,256,2,230);
-  barrierX3.visible=false;}
-}
-
-
-function draw() {
-  background(bg);  
-  if(gameState==="play"){
-    boy.visible=true;
-    buttonStart.visible=false;
-
+    barrierX.visible=false;
+    
+    barrierX1=createSprite(635,448,2,100);
+    barrierX1.visible=false;
+    
+    barrierX2=createSprite(900,256,2,230);
+    barrierX2.visible=false;
+    
+    barrierX3=createSprite(1140,256,2,230);
+    barrierX3.visible=false;}
+    
   }
-  if(mousePressedOver(buttonStart)){
+  
+  
+  function draw() {
+    background(bg);  
+    
+    if(gameState==="wait"){
+      boy.visible=false;
+      buttonStart.visible=true; 
+    }
+    
+    if(gameState==="play"){
+      boy.visible=true;
+      buttonStart.visible=false;
+      
+    }
+    if(mousePressedOver(buttonStart)){
     buttonStart.visible=false;
     gameState="play";
     boy.visible=true;
-  }
-  
-  for(var i = 64; i < width; i=i+128){
-    strokeWeight(2);
-    stroke("white")
-    line(i,0,i,width);
-  }
-  for(var i = 64; i < height; i=i+128){
-    strokeWeight(2);
-    stroke("white")
-    line(0,i,width,i);
-  }
-  for(var i = 128; i < width; i=i+128){
-    strokeWeight(5);
-    stroke("white")
-    line(i,0,i,width);
-  }
-  for(var i = 128; i < height; i=i+128){
-    strokeWeight(5);
-    stroke("white")
-    line(0,i,width,i);
-  }
-  if(keyIsDown(UP_ARROW) && keyIsDown(RIGHT_ARROW) && jump === true  && boyDirection==="right" && boy.y > jumpLimit && boyMoveX==="true"){
-    boyDirection="right";
-    boy.y = boy.y-6;
-    boy.changeAnimation("boyRJump", boyRJump);
-  }
-  
-  //console.log(jump)
-  //console.log(boyDirection)
-  boyControl();
-  boyTouchingGround();
-  boyMoveXTrue();
-
-  textSize(15);
-  fill("white");
-  drawSprites();
+    }
+    boy.setCollider("rectangle",0,0,300,500)
+    
+    boyControl();
+    boyTouchingGround();
+    boyMoveXTrue();
+    zombieSpawn();
+    textSize(15);
+    fill("white");
+    drawSprites();
 }
 function boyControl(){
 
@@ -245,7 +225,7 @@ function boyControl(){
     boy.changeAnimation("boyRIdle",boyRIdle)
   }
 
-  if(keyDown(LEFT_ARROW) && boyMoveX==="true"){
+  if(keyIsDown(LEFT_ARROW) && boyMoveX==="true"){
     boyDirection="left";
     boy.changeAnimation("boyLRun",boyLRun)
     boy.x =boy.x-5;
@@ -254,41 +234,42 @@ function boyControl(){
   }
 
   if(keyIsDown(UP_ARROW) && keyIsDown(RIGHT_ARROW) && jump === true  && boyDirection==="right" && boy.y > jumpLimit && boyMoveX==="true"){
-    boyDirection="right";
     boy.y = boy.y-6;
     boy.changeAnimation("boyRJump", boyRJump);
   }
 
-  if(keyIsDown(UP_ARROW) && keyDown(LEFT_ARROW) && jump === true && boyDirection==="left" && boy.y > jumpLimit){
-    boyDirection="left";
+  if(keyIsDown(UP_ARROW) && keyIsDown(LEFT_ARROW) && jump === true && boyDirection==="left" && boy.y > jumpLimit && boyMoveX==="true"){
     boy.y = boy.y-6;
     boy.changeAnimation("boyLJump", boyLJump);
   }
 
   if(boy.y < jumpLimit && boyDirection === "right" && keyIsDown(UP_ARROW)){
+    boy.velocityY = 4;
     jump = false;
     boy.changeAnimation("boyRIdle", boyRIdle);
-    boy.velocityY = 4;
   }
   if(boy.y < jumpLimit && boyDirection === "left" && keyWentDown(UP_ARROW)){
+    boy.velocityY = 4;
     jump = false;
     boy.changeAnimation("boyLIdle", boyLIdle);
-    boy.velocityY = 4;
   }
 
-  if(keyIsDown(DOWN_ARROW) && keyIsDown(RIGHT_ARROW) && boyDirection==="right"){
+  if(keyIsDown(DOWN_ARROW) && keyIsDown(RIGHT_ARROW) && boyDirection==="right" && boyMoveX==="true"){
     boy.x = boy.x+2;
     boy.changeAnimation("boyRSlide", boyRSlide);
-  }else if(keyWentUp(DOWN_ARROW)){
-    boy.y=boy.y-9;
+    boy.setCollider("rectangle",0,130,99,99)
+  }else if(keyWentUp(DOWN_ARROW) && boyMoveX==="true"){
+    boy.y=boy.y-10;
   }
-
+  
   if(keyIsDown(DOWN_ARROW) && keyIsDown(LEFT_ARROW) && boyDirection==="left"){
     boy.x = boy.x-2;
     boy.changeAnimation("boyLSlide", boyLSlide);
+    boy.setCollider("rectangle",0,130,99,99)
   }else if(keyWentUp(DOWN_ARROW)){
-    boy.y=boy.y-9;
+    boy.y=boy.y-10;
   }
+  
 }
 
 function boyTouchingGround(){
@@ -302,6 +283,15 @@ function boyTouchingGround(){
   }else{
     boy.velocityY = 4;
   }
+
+  if(boy.isTouching(invisibleGround)
+  || boy.isTouching(invisibleGround1)
+  || boy.isTouching(invisibleGround2)
+  || boy.isTouching(invisibleGround3)
+  || boy.isTouching(invisibleGround4)){
+    jumpPosY=boy.y;
+    jumpLimit=jumpPosY-130;
+  }
 }
 
 function boyMoveXTrue(){
@@ -313,8 +303,6 @@ function boyMoveXTrue(){
     boyMoveX="false";
     boy.changeAnimation("boyRIdle", boyRIdle);
     boy.x += 5;
-  }else{
-    boyMoveX = "true"
   }
   if(boy.isTouching(barrierX)
   || boy.isTouching(barrierX1)
@@ -324,33 +312,31 @@ function boyMoveXTrue(){
     boyMoveX="false";
     boy.changeAnimation("boyLIdle", boyLIdle);
     boy.x = boy.x - 5;
-  }else{
-    boyMoveX = "true"
+  }
+  if(!boy.isTouching(barrierX)
+  || !boy.isTouching(barrierX1)
+  || !boy.isTouching(barrierX2)
+  || !boy.isTouching(barrierX3)){
+    boyMoveX="true";
   }
 }
 
 function zombieSpawn(){
-  if(frameCount%60===0){
-    zombie=createSprite(Math.round(random(100,1300)),0);
+  if(frameCount % 60 === 0){
+    zombie=createSprite(Math.round(random(128,702)),-10);
+    zombie.addAnimation("zombieRWalk",zombieRWalk)
     zombie.scale=0.25;
-    if(zombie.x <= width/2){
-      zombie.addAnimation("zombieRWalk",zombieRWalk);
-      zombie.velocityX=1;
-    }else{
-      zombie.addAnimation("zombieLWalk",zombieLWalk);
-      zombie.velocityX=-1;
-    }
   }
-}
-
-function zombieTouchingGround(){
-  if(zombie.isTouching(invisibleGround)
-  || zombie.isTouching(invisibleGround1)
-  || zombie.isTouching(invisibleGround2)
-  || zombie.isTouching(invisibleGround3)
-  || zombie.isTouching(invisibleGround4)){
-    zombie.velocityY = 0;
-  }else{
-    zombie.velocityY = 4;
+  if(frameCount % 90 === 0){
+    zombie=createSprite(-40,Math.round(random(706,1220)));
+    zombie.addAnimation("zombieLWalk",zombieLWalk)
+    zombie.scale=0.25;
   }
+  if(zombie.isTouching(barrierX)
+  || zombie.isTouching(barrierX1)
+  || zombie.isTouching(barrierX2)
+  || zombie.isTouching(barrierX3)){
+    zombie.y +=5;
+  }
+  
 }
