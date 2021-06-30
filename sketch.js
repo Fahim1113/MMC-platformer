@@ -17,6 +17,8 @@ var barrierX, barrierX1, barrierX2, barrierX3;
 var jumpPosY, jumpLimit;
 var jump = true;
 
+var zombieGroup;
+
 function preload(){
   bg=loadImage("BG.png");
   buttonStartImg=loadImage("buttons/play.png")
@@ -183,7 +185,7 @@ function setup() {
     
     barrierX3=createSprite(1140,256,2,230);
     barrierX3.visible=false;}
-    
+    zombieGroup=new Group()
   }
   
   
@@ -211,6 +213,12 @@ function setup() {
     boyTouchingGround();
     boyMoveXTrue();
     zombieSpawn();
+    if(zombieGroup.isTouching(barrierX)
+    || zombieGroup.isTouching(barrierX1)
+    || zombieGroup.isTouching(barrierX2)
+    || zombieGroup.isTouching(barrierX3)){
+      zombieGroup.setVelocityYEach(0);
+    }
     textSize(15);
     fill("white");
     drawSprites();
@@ -326,17 +334,23 @@ function zombieSpawn(){
     zombie=createSprite(Math.round(random(128,702)),-10);
     zombie.addAnimation("zombieRWalk",zombieRWalk)
     zombie.scale=0.25;
+    zombieGroup.add(zombie);
+    zombieGroup.setVelocityYEach(5);
+    if(zombie.isTouching(barrierX)
+    || zombie.isTouching(barrierX1)
+    || zombie.isTouching(barrierX2)
+    || zombie.isTouching(barrierX3)){
+      zombieGroup.setVelocityYEach(0);
+    }
   }
   if(frameCount % 90 === 0){
     zombie=createSprite(-40,Math.round(random(706,1220)));
     zombie.addAnimation("zombieLWalk",zombieLWalk)
     zombie.scale=0.25;
+    zombieGroup.add(zombie);
+    zombieGroup.setVelocityYEach(5);
+    
   }
-  if(zombie.isTouching(barrierX)
-  || zombie.isTouching(barrierX1)
-  || zombie.isTouching(barrierX2)
-  || zombie.isTouching(barrierX3)){
-    zombie.y +=5;
-  }
+  
   
 }
